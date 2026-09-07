@@ -100,7 +100,7 @@ A call that cannot start is still reported *on the socket*: the connection is ac
 | symptom | fix |
 | --- | --- |
 | `pyaudio` fails to install | `brew install portaudio` (macOS) / `apt install portaudio19-dev` (Debian) |
-| `[Errno -9997] Invalid sample rate` | your device refuses 24 kHz; open at its native rate and resample (see `11-raspberry-pi/audio_utils.py`) |
+| `[Errno -9997] Invalid sample rate` | your device refuses 24 kHz; open it at its native rate and resample to 24 kHz before sending (see `docs/audio-resampling.md`) |
 | agent talks over itself / echo | terminal client has no echo cancellation — use headphones, or the browser page (which has `echoCancellation: true`) |
 | `409 agent_not_deployed` on register | press **Deploy** in the dashboard |
 | close `4000` right after connect | read the `error` frame: usually `concurrency_limit_exceeded` or `insufficient_balance` |

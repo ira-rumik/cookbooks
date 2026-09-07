@@ -54,7 +54,7 @@ The European sibling; same idea, different curve. See `10-nodejs-telephony-bridg
 
 ## Streaming linear resampler with a low-pass stage
 
-This is the shape used by every bridge in the repository (`lib/resampler.js` in the Node cookbooks, `audio_utils.py` on the Raspberry Pi):
+This is the shape used by every bridge in the repository (`lib/resampler.js` in the Node cookbooks):
 
 ```
 in (rate A) ──▶ [FIR low-pass, only if A > B] ──▶ [fractional-position linear interpolation] ──▶ out (rate B)

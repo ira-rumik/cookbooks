@@ -28,8 +28,6 @@ Silk exposes two transports for a live call. Every cookbook here uses one of the
 | **Tier 3 — telephony** | | | |
 | 09 | [Twilio Media Streams](./09-twilio-media-streams) | WebSocket | Node/Express, TwiML `<Connect><Stream>`, μ-law 8 kHz ⇄ PCM 24 kHz bridge |
 | 10 | [Generic Node.js telephony bridge](./10-nodejs-telephony-bridge) | WebSocket | `ws`, dynamic resampling, adapters for Plivo, Exotel and raw PCM/SIP |
-| **Tier 4 — hardware & edge** | | | |
-| 11 | [Raspberry Pi / embedded Linux](./11-raspberry-pi) | WebSocket (+ WebRTC option) | Python, `pyaudio`, GPIO push-to-talk, no GUI |
 
 Supporting material:
 

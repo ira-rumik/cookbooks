@@ -8,7 +8,7 @@ sends `interruption`, the playback queue is dropped immediately.
 
 macOS, Windows and ALSA's `default` device all resample transparently, so
 opening the device at 24 kHz works almost everywhere. If your device refuses,
-see 11-raspberry-pi/audio_utils.py for a resampling capture loop.
+resample to 24 kHz before sending (see docs/audio-resampling.md).
 """
 
 from __future__ import annotations

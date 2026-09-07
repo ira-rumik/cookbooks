@@ -60,7 +60,7 @@ If the agent participant publishes the LiveKit `lk.agent.state` attribute (`list
 
 ## Transport B — WebSocket (realtime socket)
 
-Used by the Python, Node.js, telephony and Raspberry Pi cookbooks.
+Used by the Python, Node.js and telephony cookbooks.
 
 ```mermaid
 sequenceDiagram
