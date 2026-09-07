@@ -1,0 +1,11 @@
+<!-- Add inside the top-level <dict> of ios/Runner/Info.plist -->
+<key>NSMicrophoneUsageDescription</key>
+<string>Silk Voice uses the microphone so you can talk to the assistant.</string>
+<!-- Only if you ever enable the camera; livekit_client does not require it. -->
+<key>NSCameraUsageDescription</key>
+<string>Not used.</string>
+<!-- Keep the call alive when the app is backgrounded. -->
+<key>UIBackgroundModes</key>
+<array>
+  <string>audio</string>
+</array>

@@ -1,0 +1,7 @@
+fastapi>=0.115
+uvicorn[standard]>=0.30
+websockets>=12
+httpx>=0.27
+python-dotenv>=1.0
+# local microphone test only (optional). On macOS: brew install portaudio first.
+pyaudio>=0.2.14

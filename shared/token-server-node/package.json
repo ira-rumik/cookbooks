@@ -1,0 +1,19 @@
+{
+  "name": "silk-token-server-node",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Minimal Express backend that swaps a Silk API key for per-call credentials (WebRTC join token or single-use WebSocket token).",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

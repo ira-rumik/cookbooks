@@ -1,0 +1,24 @@
+{
+  "name": "silk-nodejs-websocket",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Talk to a Silk voice agent from Node.js over the realtime socket — server-to-server, plus a browser bridge.",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "mic": "node local-mic.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "ws": "^8.18.0"
+  },
+  "optionalDependencies": {
+    "node-record-lpcm16": "^1.0.1",
+    "speaker": "^0.5.5"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

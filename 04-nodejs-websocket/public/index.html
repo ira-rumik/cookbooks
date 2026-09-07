@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Silk realtime socket · Node bridge</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 560px; margin: 48px auto; padding: 0 20px; color: #1c1917; }
+    button { font: inherit; padding: 10px 18px; border-radius: 999px; border: 1px solid #e7e5e4; background: #c2410c; color: #fff; cursor: pointer; }
+    button.secondary { background: transparent; color: inherit; }
+    button:disabled { opacity: .5; cursor: default; }
+    .orb { width: 120px; height: 120px; margin: 28px auto; border-radius: 50%; background: #a8a29e; transition: background .15s; }
+    .orb[data-state=thinking]     { background: #f59e0b; }
+    .orb[data-state=speaking]     { background: #dc2626; }   /* red: agent talking */
+    .orb[data-state=interrupting] { background: #16a34a; }   /* green: you cut in  */
+    #status { text-align: center; color: #78716c; }
+    #transcript { margin-top: 20px; font-size: 14px; line-height: 1.5; }
+    #transcript .user { color: #16a34a; } #transcript .assistant { color: #dc2626; }
+  </style>
+</head>
+<body>
+  <h1>Silk · WebSocket via Node.js</h1>
+  <p>Audio goes browser → Node → Silk and back. The server owns the API key and the Silk socket.</p>
+  <div><button id="start">Start call</button> <button id="stop" class="secondary" disabled>Hang up</button></div>
+  <div id="orb" class="orb" data-state="idle"></div>
+  <div id="status">idle</div>
+  <div id="transcript"></div>
+
+  <script>
+    const RATE = 24000, FRAME = 480;
+    const orb = document.getElementById("orb"), statusEl = document.getElementById("status"), transcriptEl = document.getElementById("transcript");
+    const startBtn = document.getElementById("start"), stopBtn = document.getElementById("stop");
+    let ws, ctx, micStream, tap, state = "idle", playhead = 0, scheduled = [];
+
+    function setState(s, text) { state = s; orb.dataset.state = s; statusEl.textContent = text || s; }
+
+    // ---- playback: schedule chunks back-to-back; keep handles so we can flush on interruption
+    function playChunk(arrayBuffer) {
+      const pcm = new Int16Array(arrayBuffer);
+      const buf = ctx.createBuffer(1, pcm.length, RATE);
+      const ch = buf.getChannelData(0);
+      for (let i = 0; i < pcm.length; i++) ch[i] = pcm[i] / 32768;
+      const src = ctx.createBufferSource();
+      src.buffer = buf; src.connect(ctx.destination);
+      const at = Math.max(ctx.currentTime + 0.03, playhead);
+      src.start(at); playhead = at + buf.duration;
+      scheduled.push(src);
+      src.onended = () => { const i = scheduled.indexOf(src); if (i >= 0) scheduled.splice(i, 1); };
+    }
+    function flushPlayback() {                       // ← barge-in
+      for (const s of scheduled) { try { s.stop(); } catch (_) {} }
+      scheduled = []; playhead = 0;
+    }
+
+    // ---- capture: AudioWorklet → 480-sample Int16 frames → binary WS frames
+    const WORKLET = `class Tap extends AudioWorkletProcessor {
+      constructor() { super(); this.buf = new Float32Array(${FRAME}); this.n = 0; }
+      process(inputs) {
+        const c = inputs[0] && inputs[0][0]; if (!c) return true;
+        for (let i = 0; i < c.length; i++) {
+          this.buf[this.n++] = c[i];
+          if (this.n === ${FRAME}) {
+            const pcm = new Int16Array(${FRAME});
+            for (let j = 0; j < ${FRAME}; j++) { const s = Math.max(-1, Math.min(1, this.buf[j])); pcm[j] = s < 0 ? s * 0x8000 : s * 0x7fff; }
+            this.port.postMessage(pcm.buffer, [pcm.buffer]); this.n = 0;
+          }
+        }
+        return true;
+      }
+    } registerProcessor("tap", Tap);`;
+
+    async function startMic() {
+      micStream = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
+      await ctx.audioWorklet.addModule(URL.createObjectURL(new Blob([WORKLET], { type: "application/javascript" })));
+      tap = new AudioWorkletNode(ctx, "tap");
+      tap.port.onmessage = (e) => { if (ws && ws.readyState === WebSocket.OPEN) ws.send(e.data); };
+      ctx.createMediaStreamSource(micStream).connect(tap);   // not connected to destination: no local echo
+    }
+    function stopMic() { tap && tap.disconnect(); micStream && micStream.getTracks().forEach((t) => t.stop()); }
+
+    function addLine(role, text, final) {
+      let el = transcriptEl.querySelector(`[data-role=${role}][data-final=false]`);
+      if (!el) { el = document.createElement("div"); el.className = role; el.dataset.role = role; transcriptEl.appendChild(el); }
+      el.textContent = `${role}: ${text}`; el.dataset.final = String(final);
+      transcriptEl.scrollTop = transcriptEl.scrollHeight;
+    }
+
+    startBtn.onclick = async () => {
+      startBtn.disabled = true;
+      ctx = new AudioContext({ sampleRate: RATE });       // one 24 kHz context for capture and playback
+      await ctx.resume();
+      ws = new WebSocket(`${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/ws/agent`);
+      ws.binaryType = "arraybuffer";
+      ws.onopen = () => setState("connecting");
+      ws.onmessage = async (e) => {
+        if (e.data instanceof ArrayBuffer) return playChunk(e.data);   // output_audio.delta, already decoded
+        const msg = JSON.parse(e.data);
+        switch (msg.type) {
+          case "session.created":  await startMic(); stopBtn.disabled = false; setState("listening", `listening · call ${msg.call_id}`); break;
+          case "agent_start_talking": setState("speaking"); break;
+          case "agent_stop_talking":  if (state !== "interrupting") setState("listening"); break;
+          case "interruption":        flushPlayback(); setState("interrupting", "you interrupted — go ahead");
+                                      setTimeout(() => state === "interrupting" && setState("listening"), 700); break;
+          case "transcript":          addLine(msg.role, msg.text, true); if (msg.role === "user") setState("thinking"); break;
+          case "transcript.delta":    addLine(msg.role, msg.text, false); break;
+          case "session.closed":      setState("idle", `ended: ${msg.reason}`); break;
+          case "error":               setState("idle", `error ${msg.code}: ${msg.message}`); break;
+        }
+      };
+      ws.onclose = () => { stopMic(); flushPlayback(); startBtn.disabled = false; stopBtn.disabled = true; if (state !== "idle") setState("idle"); };
+    };
+    stopBtn.onclick = () => { ws && ws.send(JSON.stringify({ type: "session.close" })); };
+  </script>
+</body>
+</html>

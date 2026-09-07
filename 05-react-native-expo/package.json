@@ -1,0 +1,29 @@
+{
+  "name": "silk-react-native-expo",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.ts",
+  "scripts": {
+    "start": "expo start --dev-client",
+    "prebuild": "expo prebuild",
+    "ios": "expo run:ios",
+    "android": "expo run:android"
+  },
+  "dependencies": {
+    "@config-plugins/react-native-webrtc": "^10.0.0",
+    "@livekit/components-react": "^2.9.9",
+    "@livekit/react-native": "^2.7.6",
+    "@livekit/react-native-expo-plugin": "^1.0.1",
+    "@livekit/react-native-webrtc": "^125.0.11",
+    "expo": "~52.0.0",
+    "expo-dev-client": "~5.0.0",
+    "livekit-client": "^2.13.3",
+    "react": "18.3.1",
+    "react-native": "0.76.9"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.25.0",
+    "@types/react": "~18.3.12",
+    "typescript": "^5.3.3"
+  }
+}

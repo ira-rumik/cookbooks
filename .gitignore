@@ -1,0 +1,37 @@
+# secrets
+.env
+.env.*
+!.env.example
+
+# node
+node_modules/
+.next/
+dist/
+npm-debug.log*
+yarn-error.log*
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# mobile
+ios/Pods/
+ios/build/
+android/build/
+android/app/build/
+android/.gradle/
+.expo/
+*.xcworkspace/xcuserdata/
+DerivedData/
+.dart_tool/
+.flutter-plugins*
+build/
+
+# editors / os
+.DS_Store
+.idea/
+.vscode/
+*.swp

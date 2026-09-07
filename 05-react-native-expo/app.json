@@ -1,0 +1,40 @@
+{
+  "expo": {
+    "name": "Silk Voice",
+    "slug": "silk-voice",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": false,
+    "plugins": [
+      "@livekit/react-native-expo-plugin",
+      [
+        "@config-plugins/react-native-webrtc",
+        {
+          "microphonePermission": "Silk Voice uses the microphone so you can talk to the assistant.",
+          "cameraPermission": "Not used."
+        }
+      ]
+    ],
+    "ios": {
+      "bundleIdentifier": "ai.rumik.silkvoice",
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "Silk Voice uses the microphone so you can talk to the assistant.",
+        "UIBackgroundModes": ["audio"]
+      }
+    },
+    "android": {
+      "package": "ai.rumik.silkvoice",
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.BLUETOOTH",
+        "android.permission.BLUETOOTH_CONNECT",
+        "android.permission.INTERNET",
+        "android.permission.ACCESS_NETWORK_STATE"
+      ],
+      "usesCleartextTraffic": true
+    }
+  }
+}

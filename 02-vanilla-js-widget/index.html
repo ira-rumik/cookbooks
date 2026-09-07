@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Silk widget demo</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 640px; margin: 60px auto; padding: 0 20px; color: #1c1917; }
+    code { background: #f5f5f4; padding: 2px 6px; border-radius: 4px; }
+    #log { font: 13px/1.5 ui-monospace, monospace; background: #f5f5f4; padding: 12px; border-radius: 8px; min-height: 80px; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <h1>Any page, any CMS</h1>
+  <p>
+    This page has no build system. The floating bubble in the corner comes from a single
+    <code>&lt;script&gt;</code> tag at the bottom of the file. Click it and talk.
+  </p>
+  <p>
+    Colours: <b style="color:#f87171">red</b> while the agent speaks,
+    <b style="color:#4ade80">green</b> the moment you talk over it.
+  </p>
+  <p>Widget events:</p>
+  <div id="log"></div>
+
+  <!--
+    The widget. data-token-url must point at a backend that calls /v1/webcall
+    with your API key. For local testing run ../shared/token-server-node on :8787.
+  -->
+  <script src="./silk-widget.js"
+          data-token-url="http://localhost:8787/api/token"
+          data-label="Talk to our AI"
+          data-color="#c2410c"
+          data-position="bottom-right"></script>
+
+  <script>
+    // Optional: listen to the widget from your own page code.
+    var log = document.getElementById("log");
+    function line(s) { log.textContent += s + "\n"; }
+    SilkWidget
+      .on("state", function (s) { line("state → " + s); })
+      .on("connected", function (call) { line("connected, callId=" + call.callId); })
+      .on("disconnected", function () { line("disconnected"); })
+      .on("error", function (e) { line("error: " + e.message); });
+  </script>
+</body>
+</html>
