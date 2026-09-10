@@ -164,3 +164,18 @@ Client SDKs used in this repo:
 | iOS | `https://github.com/livekit/client-sdk-swift` |
 | Android | `io.livekit:livekit-android` |
 | Python (edge/servers) | `livekit` |
+
+Versions the cookbooks pin, and were last tested against (2026-09):
+
+| cookbook | package | version |
+| --- | --- | --- |
+| 01 Next.js | `livekit-client` / `@livekit/components-react` / `@livekit/components-styles` | 2.22.3 / 2.9.24 / 1.2.0 |
+| 02 widget | `livekit-client` UMD from jsDelivr | 2.22.3 (exact URL, no floating `@2`) |
+| 05 React Native | `@livekit/react-native` / `@livekit/react-native-webrtc` / `livekit-client` | 2.12.0 / 144.1.2 / 2.22.3 |
+| 06 Flutter | `livekit_client` | `^2.4.0` (resolves to 2.12.0) |
+| 07 iOS | `client-sdk-swift` | 2.x from 2.0.0 (resolves to 2.16.0) |
+| 08 Android | `io.livekit:livekit-android` | 2.15.0 |
+
+The JS packages are pinned to exact versions on purpose: the LiveKit React Native SDK and its WebRTC package move in lock-step (`@livekit/react-native` 2.12 requires `@livekit/react-native-webrtc` 144), and caret ranges let them drift apart until a fresh `npm install` fails. Bump them together.
+
+Silk's hosted LiveKit runs server 1.9.12 or newer. Browser and React Native clients from `livekit-client` 2.18.8 onward rely on the server echoing SDP offer ids; an older server makes every call reconnect about every 15 s. If you point a cookbook at a self-hosted LiveKit for local development, use server 1.9.12 or newer.
