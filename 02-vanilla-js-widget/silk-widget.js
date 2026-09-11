@@ -28,7 +28,9 @@
     label: ds.label || "Talk to our AI",
     color: ds.color || "#c2410c",
     position: ds.position === "bottom-left" ? "bottom-left" : "bottom-right",
-    livekitSrc: ds.livekitSrc || "https://cdn.jsdelivr.net/npm/livekit-client@2/dist/livekit-client.umd.min.js",
+    // Exact version on purpose: a floating `@2` would change the SDK under every
+    // deployed widget the day a new release lands. Bump deliberately, then re-test.
+    livekitSrc: ds.livekitSrc || "https://cdn.jsdelivr.net/npm/livekit-client@2.22.3/dist/livekit-client.umd.min.js",
     agentId: ds.agentId || null, // optional; your token server decides whether to honour it
   };
 

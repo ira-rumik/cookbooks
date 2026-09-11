@@ -32,7 +32,7 @@ cd shared/token-server-node && cp .env.example .env && npm install && npm start 
 
 # 1. the app
 cd 05-react-native-expo
-npm install
+npm install                        # LiveKit packages are pinned exactly (react-native 2.12.0, react-native-webrtc 144.1.2, livekit-client 2.22.3): bump them together
 cp .env.example .env               # EXPO_PUBLIC_TOKEN_URL — see "reaching the backend" below
 npx expo prebuild                  # generates ios/ and android/ with the WebRTC plugins applied
 npx expo run:ios --device          # or: npx expo run:android
